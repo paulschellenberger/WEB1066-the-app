@@ -1,8 +1,36 @@
 language: java
-jdk: oraclejdk9
+jdk: 
+- oraclejdk9
+
+services:
+- docker
+
+env:
+  global:
+  - DOCKER_LOGIN=paulschellenberger
+  - DOCKER_PASSWORD=e7e7b0f6-f166-4656-8e6d-842585da0a6f
+
+  matrix:
+  - COVERAGE=0.5 BUILD_TARGET=./monolithic/ui
+  - COVERAGE=0.5 BUILD_TARGET=./monolithic/service/cart
+  - COVERAGE=0.5 BUILD_TARGET=./monolithic/service/user
+
+  - COVERAGE=0.24 BUILD_TARGET=./monolithic/repository/order
+  - COVERAGE=0.5 BUILD_TARGET=./monolithic/repository/cart
+  - COVERAGE=0.5 BUILD_TARGET=./monolithic/repository/product
+  - COVERAGE=0.24 BUILD_TARGET=./monolithic/repository/user
 
 install:
 - ./gradlew clean jar
 
 script:
-- ./gradlew test
+- ./gradlew -p $BUILD_TARGET check
+
+after_success:
+- find . -name jacocoTestReport.csv|xargs cat|awk -F',' '{print $3" "$4" "$5}'
+
+deploy:
+  provider: script
+  script: bash -c "echo \"${DOCKER_PASSWORD}\" | docker login --username \"${DOCKER_LOGIN}\" --password-stdin"
+  on:
+    all_branches: true
