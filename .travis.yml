@@ -8,7 +8,7 @@ services:
 env:
   global:
   - DOCKER_LOGIN=paulschellenberger
-  - DOCKER_PASSWORD=e7e7b0f6-f166-4656-8e6d-842585da0a6f
+  - secure: e7e7b0f6-f166-4656-8e6d-842585da0a6f
 
   matrix:
   - COVERAGE=0.5 BUILD_TARGET=./monolithic/ui
